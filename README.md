@@ -23,6 +23,7 @@ Note also that since each pixel represents three bytes of data (RGB in the RGBA 
 
 ## Example
  ![there is data in here](https://i.imgur.com/GYpBEGg.png)
+
 You can try out manipulating canvas data with `example.html` or via [this demo](https://naknomum.github.io/CanvasFS/).
 
 For kicks, I added some **steganographic functionality**. This expects the canvas to be loaded with an image, and then attempts to "hide" the data in the image.  It does so by manipulating the *least-significant bit* of the RGB values for existing pixels in the image.  Eight consecutive such bits (*i.e.* 2-2/3 pixels) will store one byte of input data.  The first two bytes stored this way represent the length of bytes of actual data stored.  This functionality is available using `canv.cfsSetSteg(data)` and `canv.cfsGetSteg()`.
