@@ -15,9 +15,9 @@ var out = canv.cfsGetData();
 ```
 
 ## Details
-Data input/output is a [`Uint8ClampedArray`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray), so you will need to manipulate this to suit your needs.  Bytes are stored only the the **RGB** bytes of the canvas, as I experienced some inconsistent behavior with how the alpha byte persisted in some situations, such as conversion to PNG, which varied by browser, etc.
+Data input/output is a [`Uint8ClampedArray`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray), so you will need to manipulate this to suit your needs.  Data is stored only in the **RGB** bytes of the canvas, as I experienced some inconsistent behavior with how the alpha byte persisted in some situations, such as conversion to PNG, which varied by browser, etc.
 
-The current implementation resizes the canvas to the **nearest square image** that will fit all the data.  This could easily be extended to accommodate constraints such as specified aspect ratios, width/height, etc.  Unless the canvas is set to be a *single pixel wide* (or high), there is likely going to be the case that there will be unused pixels.  Used pixels have the **alpha byte set to 255** and for unused it is set to 0.
+The current implementation resizes the canvas to the **nearest square image** that will fit all the data.  This could easily be extended to accommodate constraints such as specified aspect ratios, width/height, etc.  Unless the canvas is set to be a *single pixel wide* (or high), there is likely going to be the case that there will be *unused pixels*.  Unused pixels have the **alpha byte set to 0** (and data-carrying pixels have it set to 255).
 
 Note also that since each pixel represents three bytes of data (RGB in the RGBA data for the pixel), data will always be stored on a boundary of 3, so there may be some padded 0x00 bytes in the final pixel.  I have plans to solve this by setting the alpha value of this last pixel to denote how many bytes to use.
 
