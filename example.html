@@ -1,0 +1,90 @@
+<html><head><title>canvasFS</title>
+<script src="canvasFS.js"></script>
+
+<script>
+var canv;
+var stegged = false;
+function init() {
+	canv = document.getElementById('canvas');
+	resetReadVal();
+	CanvasFS(canv);
+}
+
+
+function update() {
+	stegged = false;
+	resetReadVal();
+	var ta = document.getElementById('text-in');
+	if (!ta.value) return;
+	canv.cfsSetData(canv.cfsStringToArr(ta.value, true));
+	ta.value = '';
+	document.getElementById('debug').innerHTML = canv.width + 'x' + canv.height;
+}
+
+function read() {
+	if (stegged) {
+		document.getElementById('read-val').innerHTML = canv.cfsArrToString(canv.cfsGetSteg());
+	} else {
+		document.getElementById('read-val').innerHTML = canv.cfsArrToString(canv.cfsGetData());
+	}
+}
+
+function resetReadVal() {
+	document.getElementById('read-val').innerHTML = '<i style="color: #666">text read from image will appear here</i>';
+}
+
+function steg() {
+	resetReadVal();
+	stegged = true;
+	var ta = document.getElementById('text-in');
+	if (!ta.value) return;
+	var img = document.getElementById('baboon');
+	canv.width = img.width;
+	canv.height = img.height;
+	canv.getContext('2d').drawImage(img, 0, 0);
+	var arr = canv.cfsStringToArr(ta.value);
+	var fit = canv.cfsSetSteg(arr);
+	document.getElementById('debug').innerHTML = fit + ' fit of ' + arr.length;
+	ta.value = '';
+}
+
+
+function imgur() {
+	var img = document.getElementById('from-imgur');
+	canv.width = img.width;
+	canv.height = img.height;
+	canv.getContext('2d').drawImage(img, 0, 0);
+	document.getElementById('read-val').innerHTML = canv.cfsArrToString(canv.cfsGetData());
+}
+
+</script>
+
+</head>
+<body onload="init()" style="font-family: arial;" >
+
+<p style="min-height: 100px;">
+	<canvas style="border: solid 1px blue;" width="10" height="10" id="canvas"></canvas>
+	<img style="border: solid 1px #888;" src="baboon.png" id="baboon" />
+</p>
+
+
+<p>
+	<textarea style="width: 400px; height: 100px;" id="text-in" placeholder="enter text here to encode into canvas"></textarea>
+	<br />
+	<input type="button" value="set (raw data)" onClick="update()" />
+	<input type="button" value="use steganography" onClick="steg()" />
+	<span id="debug"></span>
+
+</p>
+
+
+<input type="button" value="read" onClick="read()" />
+<p id="read-val" style="background-color: #DDD; padding: 5px 10px; margin: 20px 0; white-space: pre-wrap; font-size: 0.7em;"></p>
+
+<p>
+<input type="button" value="read data from this png hosted on imgur!" onClick="imgur()" /><br />
+<img style="padding: 8px;" crossOrigin="" src="//i.imgur.com/GYpBEGg.png" id="from-imgur" />
+</p>
+
+</body>
+</html>
