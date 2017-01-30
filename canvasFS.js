@@ -1,19 +1,17 @@
 function CanvasFS(cfsEl) {
 
-/* note: cfsSetData currently sets the data *expecting it to already have been padded out to skip A in the RGBA sets!*
-   this is a horrible flaw... which i need to fix.  was just a quick way to test the data as it came out of strToArr... 
-   i will refactor soon! TODO  */
     cfsEl.cfsSetData = function(d) {
         if (!(d instanceof Uint8ClampedArray)) {
-            console.error('cfsSetData() passed something other than string or Uint8ClampedArray');
+            console.error('cfsSetData() passed something other than Uint8ClampedArray');
         }
+        var prepped = this.cfsPrepArr(d);
         var ctx = this.getContext('2d');
-        var s = Math.ceil(Math.sqrt(d.byteLength / 4));
+        var s = Math.ceil(Math.sqrt(prepped.byteLength / 4));
         console.log('cfsSetData() using square side length %d', s);
         this.setAttribute('width', s);
         this.setAttribute('height', s);
         var idata = ctx.createImageData(s, s);
-        idata.data.set(d);
+        idata.data.set(prepped);
         ctx.putImageData(idata, 0, 0);
         return idata;
     };
@@ -114,22 +112,35 @@ function CanvasFS(cfsEl) {
         return new Uint8ClampedArray(arr);
     };
 
+    //this takes "raw" data (Uint8ClampedArray) and pads it out to skip the alpha bytes. it also does some other
+    //  work, like puts in the end byte (which has alpha = 0)
+    cfsEl.cfsPrepArr = function(arr) {
+        if (!(arr instanceof Uint8ClampedArray)) {
+            console.error('cfsPrepArr() passed something other than string or Uint8ClampedArray');
+        }
+        var a = new Array();
+        var b = 0;
+        //console.info('%o %d -> %d', arr, arr.length, Math.ceil(arr.length / 4) * 4);
+        for (var i = 0 ; i < (Math.ceil(arr.length / 3) * 4) ; i++) {
+            if (i % 4 == 3) {  //alpha byte
+                a[i] = 255;
+                continue;
+            }
+            a[i] = arr[b] || 0;
+            b++;
+        }
+        a.push(0, 0, 0, 0);
+        return new Uint8ClampedArray(a);
+    };
 
 ///////// some utilities (mostly string conversion)
 
 /* note, there are better (utf8) solutions here: http://stackoverflow.com/q/6965107 (just too lazy to do now) */
 
-    cfsEl.cfsStringToArr = function(str, padAlpha) {
+    cfsEl.cfsStringToArr = function(str) {
         var a = new Array();
-        var len = str.length;
-        if (len % 3) len += (3 - len % 3);
-        for (var i = 0 ; i < len ; i++) {
-            if (i < str.length) {
-                a.push(str.charCodeAt(i));
-            } else {
-                a.push(0);
-            }
-            if (padAlpha && (i % 3 == 2)) a.push(255);  // alpha value
+        for (var i = 0 ; i < str.length ; i++) {
+            a.push(str.charCodeAt(i));
         }
         return new Uint8ClampedArray(a);
     };
