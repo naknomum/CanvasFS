@@ -30,3 +30,7 @@ For kicks, I added some **steganographic functionality**. This expects the canva
 
 I have added `canv.cfsStringToArr()` and `canv.cfsArrToString()` to attempt to convert text strings to/from Uint8ClampedArray.  These do not hold up well under UTF-8, so ymmv.
 
+
+##Notes
+
+Using [this post](http://stackoverflow.com/a/11585939) as a guideline, it looks like most decent desktop browsers (Chrome, Firefox, Safari) can handle *approximately* 300m pixels in a single canvas.  Since CanvasFS utilizes the RGB bytes per pixel, this means the canvas could store almost a billion bytes of data!  I have my suspicions that for large blobs of data, CanvasFS would be unusuably slow, but it might be an interesting excercize to write more efficient seek, read, and write algorithms that use low-level canvas pixel calls.
