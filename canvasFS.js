@@ -1,5 +1,8 @@
 function CanvasFS(cfsEl) {
 
+/* note: cfsSetData currently sets the data *expecting it to already have been padded out to skip A in the RGBA sets!*
+   this is a horrible flaw... which i need to fix.  was just a quick way to test the data as it came out of strToArr... 
+   i will refactor soon! TODO  */
     cfsEl.cfsSetData = function(d) {
         if (!(d instanceof Uint8ClampedArray)) {
             console.error('cfsSetData() passed something other than string or Uint8ClampedArray');
