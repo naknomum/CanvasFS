@@ -19,7 +19,7 @@ Data input/output is a [`Uint8ClampedArray`](https://developer.mozilla.org/en-US
 
 The current implementation resizes the canvas to the **nearest square image** that will fit all the data.  This could easily be extended to accommodate constraints such as specified aspect ratios, width/height, etc.  Unless the canvas is set to be a *single pixel wide* (or high), there is likely going to be the case that there will be *unused pixels*.  Unused pixels have the **alpha byte set to 0** (and data-carrying pixels have it set to 255).
 
-Note also that since each pixel represents three bytes of data (RGB in the RGBA data for the pixel), data will always be stored on a boundary of 3, so there may be some padded 0x00 bytes in the final pixel.  I have plans to solve this by setting the alpha value of this last pixel to denote how many bytes to use.
+Note also that since each pixel represents three bytes of data (RGB in the RGBA data for the pixel), data will always be stored on a boundary of 3, so there may be some padded 0x00 bytes in the final pixel.  I have plans to solve this by setting the alpha value of this last pixel to denote how many bytes to use.  (Or possibly set the first few bytes to be length... but classic problem of how many???)
 
 ## Example
  ![there is data in here](https://i.imgur.com/GYpBEGg.png)
