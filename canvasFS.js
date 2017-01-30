@@ -19,25 +19,14 @@ function CanvasFS(cfsEl) {
     cfsEl.cfsGetData = function() {
         var ctx = this.getContext('2d');
         var idata = ctx.getImageData(0, 0, this.width, this.height);
-        var raw = idata.data;
-        var arr = new Array();
-        for (var i = 3 ; i < raw.length ; i += 4) {
-            if (raw[i] == 0) {  //bail when alpha value is zero
-                i = raw.length + 1;
-            } else {
-                for (var j = 0 ; j < 3 ; j++) {
-                    arr.push(raw[i - 3 + j]);
-                }
-            }
-        }
-        return new Uint8ClampedArray(arr);
+        return this.cfsUnprepArr(idata.data);
     };
 
 
     //this uses a two-byte length encoding in first two bytes... sorry if you want longer. :)
     cfsEl.cfsSetSteg = function(d) {
         if (!(d instanceof Uint8ClampedArray)) {
-            console.error('cfsSetSteg() passed something other than string or Uint8ClampedArray');
+            console.error('cfsSetSteg() passed something other than Uint8ClampedArray');
         }
         var ctx = this.getContext('2d');
         var idata = ctx.getImageData(0, 0, this.width, this.height);
@@ -116,7 +105,7 @@ function CanvasFS(cfsEl) {
     //  work, like puts in the end byte (which has alpha = 0)
     cfsEl.cfsPrepArr = function(arr) {
         if (!(arr instanceof Uint8ClampedArray)) {
-            console.error('cfsPrepArr() passed something other than string or Uint8ClampedArray');
+            console.error('cfsPrepArr() passed something other than Uint8ClampedArray');
         }
         var a = new Array();
         var b = 0;
@@ -132,6 +121,25 @@ function CanvasFS(cfsEl) {
         a.push(0, 0, 0, 0);
         return new Uint8ClampedArray(a);
     };
+
+    //inverse of above, basically. takes raw pixel data and finds our data
+    cfsEl.cfsUnprepArr = function(arr) {
+        if (!(arr instanceof Uint8ClampedArray)) {
+            console.error('cfsUnrepArr() passed something other than Uint8ClampedArray');
+        }
+        var a = new Array();
+        for (var i = 3 ; i < arr.length ; i += 4) {  //i is the alpha byte: 3, 7, etc..
+            if (arr[i] == 0) {  //bail when alpha value is zero
+                i = arr.length + 1;
+            } else {
+                for (var j = 0 ; j < 3 ; j++) { //here is where we may pad out unwanted 0x00 for GB or B bytes on final pixel. :( TODO
+                    a.push(arr[i - 3 + j]);
+                }
+            }
+        }
+        return new Uint8ClampedArray(a);
+    };
+
 
 ///////// some utilities (mostly string conversion)
 
